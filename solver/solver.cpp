@@ -277,16 +277,13 @@ namespace slim {
 		V.leftCols(2) = UV;
 
 		double min_bnd_edge_len = INFINITY;
-		int acc_bnd = 0;
 
-		int current_size = inner_bnd.size();
-
-		for (int e = acc_bnd; e < acc_bnd + current_size - 1; e++)
+		for (int e = 0; e < inner_bnd.size(); e++)
 		{
-			min_bnd_edge_len = (std::min)(min_bnd_edge_len,(UV.row(inner_bnd(e)) -UV.row(inner_bnd(e + 1))).squaredNorm());
+			min_bnd_edge_len = (std::min)(min_bnd_edge_len,
+				(UV.row(inner_bnd(e)) -UV.row(inner_bnd((e + 1)%inner_bnd.size()))).squaredNorm());
 		}
-		min_bnd_edge_len = (std::min)(min_bnd_edge_len,(UV.row(inner_bnd(acc_bnd)) -UV.row(inner_bnd(acc_bnd + current_size -1))).squaredNorm());
-		acc_bnd += current_size;
+
 		double area_threshold = min_bnd_edge_len / 4.0;
 		adjusted_grad(V, F_s, G, area_threshold);
 		Eigen::SparseMatrix<double> Dx = G.block(0, 0, F_s.rows(), vn);
@@ -301,7 +298,7 @@ namespace slim {
 
 	Eigen::MatrixXd slim_solve(scaf_data& d)
 	{
-		compute_jacobians(d, d.uv_o, true);
+		compute_jacobians(d, d.uv_w, true);
 		igl::slim_update_weights_and_closest_rotations_with_jacobians(d.Ji_m, d.energy_type, 0, d.W_m, d.Ri_m);
 		igl::slim_update_weights_and_closest_rotations_with_jacobians(d.Ji_s, d.energy_type, 0, d.W_s, d.Ri_s);
 		
@@ -310,7 +307,7 @@ namespace slim {
 
 		std::function<double(Eigen::MatrixXd&)> energy_func = [&](Eigen::MatrixXd& uv)
 		{ return compute_energy(d, uv); };
-
+		
 		d.energy = igl::flip_avoiding_line_search(d.F_w, d.uv_o, dest_res, energy_func) / d.mesh_area;
 		return d.uv_o;
 	}
@@ -384,10 +381,9 @@ namespace slim {
 		Eigen::VectorXd unknown_Uc((v_n - bnd_n) * dim), Uc(dim * v_n);
 
 		Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> solver;
-		solver.analyzePattern(L);
-		solver.factorize(L);
+		solver.compute(L);
 		if (solver.info() != Eigen::Success) {
-			// decomposition failed
+			std::cerr<<"decomposition failed !"<<std::endl; 
 			return;
 		}
 		unknown_Uc = solver.solve(rhs);

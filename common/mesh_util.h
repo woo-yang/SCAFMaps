@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+#include <igl/triangle_triangle_adjacency.h>
 #include "../common/mesh_type.h"
 
 namespace common {
@@ -22,4 +23,12 @@ namespace common {
 	int convert_uv_to_3d(
 		const Eigen::Matrix2Xd& uv,
 		Eigen::Matrix3Xd& V);
+
+	void vertex_triangle_adjacency(
+		const Eigen::Matrix3Xi& F, const int& n,
+		std::vector<std::vector<int>>& v_f);
+
+	void triangle_triangle_adjacency(
+		const Eigen::Matrix3Xi& F,
+		std::vector < std::vector<int>>& f_f);
 }

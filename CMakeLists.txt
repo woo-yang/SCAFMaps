@@ -26,8 +26,7 @@ add_subdirectory(${YRender} YRender_binary_dir)
 add_executable(SCAFMaps ${SOURCES})
 
 target_link_libraries(SCAFMaps PUBLIC
-    #debug SurfaceMeshd  optimized SurfaceMesh
-    #debug vtkverdict-9.1d optimized  vtkverdict-9.1
+
     YRender
     common
     mesh_io

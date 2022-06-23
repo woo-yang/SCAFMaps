@@ -125,4 +125,32 @@ namespace common {
         free(out.segmentlist);
         return 0;
     }
+
+    void vertex_triangle_adjacency(
+        const Eigen::Matrix3Xi& F, const int& n,
+        std::vector<std::vector<int>>& v_f)
+    {
+        v_f.resize(n);
+        for (int i = 0; i < F.cols(); ++i)
+            for (int j = 0; j < 3; ++j)
+                v_f[F(j, i)].push_back(i);
+    }
+
+    void triangle_triangle_adjacency(
+        const Eigen::Matrix3Xi& F,
+        std::vector < std::vector<int>>& f_f)
+    {
+        f_f.resize(F.cols());
+        std::vector<std::vector<std::vector<int>>> tt;
+        igl::triangle_triangle_adjacency(F.transpose(), tt);
+
+        for (int i = 0; i < tt.size(); ++i) {
+            for (int j = 0; j < tt[i].size(); ++j) {
+                for (auto f : tt[i][j]) {
+                    f_f[i].push_back(f);
+                }
+            }
+        }
+    }
+
 }
