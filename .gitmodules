@@ -1,0 +1,3 @@
+[submodule "YRender"]
+	path = YRender
+	url = https://github.com/woo-yang/YRender.git
