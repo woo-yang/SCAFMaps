@@ -176,7 +176,7 @@ namespace alg {
 		//The selection guarantees that the distortion 
 		//after the seam addition will be less than D.The
 		int i = 0;
-		while (s < (1 - percentage) * D_M) {
+		while (s < percentage * D_M) {
 			terminal_v.push_back(order[i]);
 			s += Dn(order[i]);
 			i++;
